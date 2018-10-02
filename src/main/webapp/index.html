@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>p01cs_casa</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+              crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+        <div class="container">
+            <h2>Ingrese 2 números del 1 al 100</h2>
+            <!--<button type="button" name="enviar" value="Enviar" id="llenar" class="btn btn-success" >Enviar</button>-->
+            <form>
+                <div id="divAncho" class="form-group">
+                    <label for="ancho">Ancho</label>
+                    <input id="ancho" type="text" class="form-control" name="ancho"><!-- required -->
+                </div>	
+                <div id="divAlto" class="form-group">
+                    <label for="alto">Alto</label>
+                    <input id="alto" type="text" class="form-control" name="alto"><!-- required -->
+                </div>
+                <input id="btn" type="button" class="btn btn-primary" value="Enviar" name="enviar">
+
+
+            </form>
+            <hr>
+            <div id="alerta" class="alert alert-success"></div>
+            <div id="error" class="alert alert-danger" ></div>
+        </div>
+        <script>
+
+            function esEntero(num) {
+                var exReg = /^\d*$/;
+                if (exReg.test(num) && (num > 0 && num < 101)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            console.log("numero: " + esEntero(5));
+            console.log("Valor de #ancho:" + $('#ancho').val());
+            $(document).ready(function () {
+
+//                $('#btn').prop('disabled', true);
+
+                $('#ancho').keydown(function () {
+                    var anchura = $('#ancho').val();
+
+                    if (!esEntero(anchura)) {
+                        $('#divAncho').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    } else {
+                        //$('#btn').prop('disabled', false);
+                        $("#error").empty();
+                    }
+                });
+                $('#alto').keydown(function () {
+                    var altura = $('#alto').val();
+                    if (!esEntero(altura)) {
+                        $('#divAlto').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    } else {
+                        // $('#btn').prop('disabled', false);
+                        $("#error").empty();
+                    }
+                });
+
+
+
+                $("#btn").click(function () {
+                    var anchura = $('#ancho').val();
+                    var altura = $('#alto').val();
+
+                    if (!esEntero(anchura)) {
+                        $('#divAncho').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    } else if (!esEntero(altura)) {
+                        $('#divAlto').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    } else {
+
+                        $("#error").empty();
+                        
+                        var altoSize = $("#alto").val();
+                        var s = '<table class="table">';
+                        for (i = 1; i <= altoSize; i++) {
+                            s += "<tr>";
+
+                            var anchoSize = $("#ancho").val();
+                            for (j = 1; j <= anchoSize; j++) {
+
+                                s += '<td id="td' + i + '_' + j + '"></td>';
+                            }
+                            s += "</tr>";
+
+                        }
+                        s += "</table>";
+                        $("#alerta").empty().append(s);
+                        //$("#error").empty();
+
+                        for (k = 1; k <= altoSize; k++) {
+                            for (l = 1; l <= anchoSize; l++) {
+                                (function (a, b) {
+
+                                    $.ajax({
+                                        url: "/p03cs_tabla_asincrona/tablaas?op1=" + a + "&op2=" + b,
+                                        cache: false,
+                                        method: "get",
+                                        dataType: "json",
+                                        success: function (data) {
+                                            $("#td" + a + "_" + b).append(data.resultado);
+                                        },
+                                        error: function (data) {
+                                            //var cadena=JSON.stringify(data);
+                                            var msj = "Mensaje del servidor: " + data.mensaje + "</br> Alto: "
+                                                    + data.alto + "</br>Ancho: " + data.ancho;
+
+                                            $("#error").empty().append("Ha habido un error. Por favor, intentelo de nuevo</br>" + msj);
+                                            $("#alerta").empty();
+
+                                        }
+
+                                    });
+                                })(k, l);
+                            }
+                        }
+                    }
+
+
+
+
+                });
+
+
+
+
+
+
+            });
+
+        </script>
+    </body>
+</html>
